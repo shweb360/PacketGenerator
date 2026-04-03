@@ -148,6 +148,7 @@ namespace KDDQPacketGenerator
                         //发送0x00
                         byteArray = SendMockeDataB(item, false);
                         GetSendPacket(item, CtrlCodeEnum.MeasureB_00, byteArray);
+                        await Task.Delay(SendInterval, token);
                         #endregion
 
                         Console.WriteLine($"--------------------------------");
@@ -230,6 +231,14 @@ namespace KDDQPacketGenerator
                 {
                     tempbytes = BitConverter.GetBytes(phaseAvg).Reverse().ToArray();
                     list.AddRange(tempbytes);
+                }
+            }
+            else
+            {
+                //无数据时，全补0
+                for (byte j = 0; j < 75; j++)
+                {
+                    list.Add(0x00);
                 }
             }
             #endregion
