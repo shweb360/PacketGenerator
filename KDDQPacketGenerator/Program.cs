@@ -153,9 +153,9 @@ namespace KDDQPacketGenerator
 
                         Console.WriteLine($"--------------------------------");
                     }
-
+                    Console.WriteLine($"==================== {sendIndex}序号发送完毕 ====================\r\n");
                     sendIndex++;
-                    Console.WriteLine($"--------------------------------");
+                    
                 }
                 catch (Exception ex)
                 {
@@ -219,16 +219,58 @@ namespace KDDQPacketGenerator
                 list.AddRange(tempbytes);
 
                 float phaseAvg = (float)GenerateRandomValue(118.1, 119.0); //相位差均值
+                #region MyRegion
+                if (item.phaseType == PhaseEnum.A)
+                {
+                    phaseAvg = (float)GenerateRandomValue(118.1, 119.0);
+                }
+                else if (item.phaseType == PhaseEnum.B)
+                {
+                    phaseAvg = (float)GenerateRandomValue(0.1, 0.3);
+                }
+                else if (item.phaseType == PhaseEnum.C)
+                {
+                    phaseAvg = (float)GenerateRandomValue(238.1, 239.1);
+                }
+                else if (item.phaseType == PhaseEnum.N)
+                {
+                    phaseAvg = (float)GenerateRandomValue(0.1, 0.3);
+                }
+                #endregion
+
+
                 tempbytes = BitConverter.GetBytes(phaseAvg).Reverse().ToArray();
                 list.AddRange(tempbytes);
 
                 double Ix1Avg = GenerateRandomValue(0.415, 0.419); //幅值均值
+                if (item.phaseType == PhaseEnum.N)
+                {
+                    Ix1Avg = (float)GenerateRandomValue(0.01, 0.03);
+                }
                 tempbytes = BitConverter.GetBytes(Ix1Avg).Reverse().ToArray();
                 list.AddRange(tempbytes);
 
                 //14次相位
                 for (byte j = 0; j < simpleTimes; j++)
                 {
+                    #region MyRegion
+                    if (item.phaseType == PhaseEnum.A)
+                    {
+                        phaseAvg = (float)GenerateRandomValue(118.1, 119.0);
+                    }
+                    else if (item.phaseType == PhaseEnum.B)
+                    {
+                        phaseAvg = (float)GenerateRandomValue(0.1, 0.3);
+                    }
+                    else if (item.phaseType == PhaseEnum.C)
+                    {
+                        phaseAvg = (float)GenerateRandomValue(238.1, 239.1);
+                    }
+                    else if (item.phaseType == PhaseEnum.N)
+                    {
+                        phaseAvg = (float)GenerateRandomValue(0.1, 0.3);
+                    }
+                    #endregion
                     tempbytes = BitConverter.GetBytes(phaseAvg).Reverse().ToArray();
                     list.AddRange(tempbytes);
                 }
@@ -631,7 +673,8 @@ namespace KDDQPacketGenerator
             CT_C,
             CT,  //单独的旧设备
             CT_ABC,  // CT 关联ABC三相
-            PT
+            PT,
+            N
         }
         /// <summary>
         /// 控制字
@@ -682,7 +725,7 @@ namespace KDDQPacketGenerator
             var sendData = sendByte.ToArray();
             serialPort.Write(sendData, 0, sendData.Length);
             
-            Console.WriteLine($"[{item.samplingTime:HH:mm:ss}] {item.code}【{item.phaseType}】分组编号={item.groupNo}  发送序号={sendIndex}  0x{(byte)ctrlCode:X2} 共 {sendData.Length} 字节");
+            Console.WriteLine($"[{item.samplingTime:HH:mm:ss}] {item.code}【{item.phaseType}相】分组编号={item.groupNo}  发送序号={sendIndex}  0x{(byte)ctrlCode:X2} 共 {sendData.Length} 字节");
             if (IsPrintMsg)
             {
                 Console.WriteLine(BitConverter.ToString(sendData).Replace("-", "") + "\r\n");
